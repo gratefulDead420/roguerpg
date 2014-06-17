@@ -108,6 +108,33 @@ class World
 		?>
 		<!-- start pageUpdate ajax load. -->
 		<script type="text/javascript">
+		//keyboard usage. for wasd keys.
+		var key1="87";  //W
+		var key2="119"; //w
+		var key3="83";  //S
+		var key4="115"; //s
+		var key5="68";  //D
+		var key6="100"; //d
+		var key7="65";  //A
+		var key8="97";  //a
+		var x='';
+		
+		//.ajax function that will create our new room load.
+		//in the future, i'd like to make this a websocket load.
+		function pageUpdate(roomid)
+		{
+			$('#divsp').html("<img src='images/ajaxloading.gif'>");
+			var grbData = $.ajax(
+			{
+				type: "GET",
+				cache: false,
+				url: "world.php?room="+roomid,
+				success: function (html)
+				{
+					$("yourhugediv").html(html);
+				}
+			});
+		}	
 		function handleKeyboard(evt)
 		{
 			evt=(evt)?evt:((window.event)?event:null);
@@ -160,7 +187,7 @@ $west = $room['west'];
 $east = $room['east'];
 $south = $room['south'];
 
-/* left,right,up,down error image links. */
+/* left,right,up,down image links. */
 echo '<tr bgcolor="#333333"><td width="250" style="border: 1px solid #000000;" bgcolor="#2b2b2b"><center>';
 
 if ($north > 0) 
@@ -181,7 +208,7 @@ else
 	echo '<img src="images/arrowWa.png">';
 }
 
-echo '<span id="divsp"></span>';
+echo '<span id="divsp"></span>'; //loading image from the ajax request.
 
 if ($east > 0) 
 {
