@@ -62,6 +62,12 @@ class World
 	}
 	
 }
+	//errors array.
+	$errors = array();
+	if (empty($errors) === false)
+	{
+		echo ' '.implode($errors).' ';
+	}
 
 	$user_roomid = $user['room'];
 	$world_main = new World($dbh);
