@@ -1,3 +1,28 @@
+<?php
+
+echo <<<JAVASCRIPT
+	<script type="text/javascript">\n
+	function show(message) {\n
+		obj = document.getElementById(message);\n
+		obj.style.visibility = 'visible';\n
+	}\n
+	</script>\n
+JAVASCRIPT;
+
+$raidid = (int)$_GET['raid']);
+$stmt = $dbh->prepare('SELECT * FROM `users` WHERE `crewid`=? AND `raidid`=? ');
+$stmt->bindParam(1, $user['crewid']);
+$stmt->bindParam(2, $raidid);
+$stmt->execute();
+$usersArr = $stmt->fetchAll();
+
+$stmt2 = $dbh->prepare('SELECT * FROM `raid_mob` WHERE `id`=? ');
+$stmt2->bindValue(1, $raidid);
+$stmt2->execute();
+$raidArr = $stmt2->fetch();
+
+
+
 $messageNum = 0;
 while (!empty($usersArr) === true || $raidArr['hp'] > 0)
 {
