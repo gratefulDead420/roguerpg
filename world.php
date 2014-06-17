@@ -39,8 +39,8 @@ class World
 		$query->bindValue(1, $userid);
 		$query->bindValue(2, $ip);
 		$query->bindValue(3, $userip);
-        $query->bindValue(4, $roomid);
-        $query->bindValue(5, $last);
+        	$query->bindValue(4, $roomid);
+        	$query->bindValue(5, $last);
 	}
 		
 	public function updateMove($roomid, $userid)
