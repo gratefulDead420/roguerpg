@@ -7,6 +7,7 @@
 
 require 'core/init.php';
 
+
 $room = isset($_GET['room']);
 $stmt = $dbh->prepare('SELECT id,roompic,north,east,south,west,name FROM world WHERE id=?');
 $stmt->bindValue(1, $_GET['room']);
@@ -209,47 +210,46 @@ else
 		<td valign="top" bgcolor="#333333">
 			<table width="250" valign="top" bgcolor="#333333">
 	<tr>
-		<td bgcolor="#2b2b2b" style="border:1px solid #000000;"><center><strong>Creatures in this room:</strong></td>
+		<td bgcolor="#2b2b2b" style="border:1px solid #000000;"><span style="font:family:verdana;font-size:9px;color:#d69820"><div align="center"><strong>Creatures in this room:</strong></div></span></td>
 		<?php
-		$stmt = $dbh->prepare('SELECT * FROM `roommobs` WHERE `roomid`=? ');
+		$stmt = $dbh->prepare('SELECT mobid,hex FROM `roommobs` WHERE `roomid`=? ');
 		$stmt->bindValue(1, $_GET['room']);
-		$stmt->execute();
-                $roommob = $stmt->fetch();
-                $roommobid = $roommob['roommobid'];
-                $mobid = $roommob['mobid'];
-                $hex = $roommob['hex'];
-                $type = $roommob['type'];
-                
-                //now get the mob data.
-                if ($type == 'norm')
+		$query = $stmt->execute();
+                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $roommob)
                 {
-                        $active = 1;
-                        $stmt = $dbh->prepare('SELECT * FROM `mobs` WHERE `mobid`=? AND `active`=? ');
-                        $stmt->bindValue(1, $mobid);
-                        $stmt->bindValue(2, $active);
-          		foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $mob)
-		        {	
-                                echo '<tr><td>';
-			        $mobname = $mob['name'];
-                                $moblevel = $mob['level'];
-                                $trainer = $mob['trainer'];
-                                $rage = $mob['rage'];
-                                $mobtitle = 'viewmobs';
+                        $mobid = $roommob['mobid'];
+                        $hex = $roommob['hex'];
+               
+                        $stmt = $dbh->prepare('SELECT name,level,trainer,rage FROM `mobs` WHERE `mobid`=? ');
+                        $stmt->bindValue(1, $roommob['mobid']);
+                        $stmt->execute();
+                        $mobrow = $stmt->fetch();
+                        
+                        echo '<tr><td>';
+			$name = $mobrow['name'];
+                        $moblevel = $mobrow['level'];
+                        $trainer = $mobrow['trainer'];
+                        $rage = $mobrow['rage'];
+                        $mobtitle = 'viewmobs';
 		?>
-	                <div style="border-bottom:1px dotted; border-color:#000000; height:15px;"> 
-                        <a href="mobattack.php?mob=<?php echo ' '.$mobid.' '; ?>"><?php echo ' '.$mobname.' '; ?>
-	                <img align="right" border="0" alt="Attack!" src="images/attackplayericon.jpg" style="cursor:pointer;" onMouseOver="menutip('Attack <?php echo ' '.$mob['name'].' '; ?>!');" onMouseOut="hideddrivetip();"> 
-	                <a href="<?php echo ' '.$mobtitle.' ';?>.php?mob=<?php echo ' '.$mobid.' '; ?>" style="cursor:pointer;">
-	                </div>
-                <?php
-                        }
-                }
-                ?>
+
+<div style="border-bottom:1px dotted; border-color:#000000; height:15px;">
+
+<a onclick="attackMob(<?php echo $mobid; ?>,'<?php echo $hex; ?>');">
+	                
+<img align="right" border="0" alt="Attack!" src="images/attackplayericon.jpg" style="cursor:pointer;" onMouseOver="menutip('Attack <?php echo ' '.$mob['name'].' '; ?>!');" onMouseOut="hideddrivetip();"></a> 
+
+<a href="<?php echo $mobtitle; ?>.php?mob=<?php echo $mobid; ?>" style="cursor:pointer;"><?php echo ' '.$name.' '; ?></td>
+
+</div>  
 	</tr>
+   <?php
+                        }
+                //}
+                ?>
    </table>
 </div>
 <?php 
-
 }
 
-?>
+?>   
