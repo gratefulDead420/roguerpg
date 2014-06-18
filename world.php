@@ -1,14 +1,13 @@
 <?php
 
 /*
-* script: world.php verson 1.0
+* script: world.php verson 2.0
 * developed by gratefulDeadty
-*
-* Todo: Error checks, create a clas for world to handle everything, and implement rooms based off logged in user.
 */
 
 require 'core/init.php';
 
+$room = isset($_GET['room']);
 $stmt = $dbh->prepare('SELECT id,roompic,north,east,south,west,name FROM world WHERE id=?');
 $stmt->bindValue(1, $_GET['room']);
 $stmt->execute();
@@ -21,8 +20,15 @@ if ($room_check == 0)
 
 if ($_GET['room'] && empty($errors) === true)
 {
+        //$stmt = $dbh->prepare('SELECT * FROM world WHERE id=?');
+        //$stmt->bindValue(1, $_GET['room']);
+        //$stmt->execute();
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $room)
         {        
+                //echo ' '.$room['name'].' ';
+                //echo '<br />';
+                //echo '<img src="images/'.$room['roompic'].'">';
+
                 $north = $room['north'];
                 $south = $room['south'];
                 $east = $room['east'];
@@ -36,7 +42,7 @@ if ($_GET['room'] && empty($errors) === true)
                 {
 	                $north = $_GET['room'];
                 }
- 
+
                 if ($south > 0)
                 {
 	                $south = $south;
@@ -46,7 +52,8 @@ if ($_GET['room'] && empty($errors) === true)
 	                $south = $_GET['room'];
                 }
 
-               if ($east > 0)
+
+                if ($east > 0)
                 {
 	                $east = $east;
                 }
@@ -65,9 +72,9 @@ if ($_GET['room'] && empty($errors) === true)
                 }
 
 
-                ?>
-                <!-- start keyboard handler and ajax load. -->
-                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        ?>
+                <!-- start pageUpdate ajax load. -->
+                <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
 		<script type="text/javascript">
 		var key1="87";  //W
 		var key2="119"; //w
@@ -79,7 +86,7 @@ if ($_GET['room'] && empty($errors) === true)
 		var key8="97";  //a
 		var x='';
 		
-		//.ajax function that loads the new room.
+		//.ajax function that will create our new room load.
 		//in the future, i'd like to make this a websocket load.
                 function pageUpdate(roomid) 
                 { 
@@ -141,7 +148,12 @@ if ($_GET['room'] && empty($errors) === true)
 	<tr style="border: 1px solid #000000; border-collapse: collapse;" bgcolor="#333333"><td width="250"><center>
 
 <?php
-
+/*
+$north = $room['north'];
+$west = $room['west'];
+$east = $room['east'];
+$south = $room['south'];
+*/
 //left,right,up,down image links.
 echo '<tr bgcolor="#333333"><td width="250" style="border: 1px solid #000000;" bgcolor="#2b2b2b"><center>';
 
@@ -184,7 +196,8 @@ else
 }
 
 
-}
+        }
+//}
 
 ?>
 
@@ -201,12 +214,27 @@ else
 		$stmt = $dbh->prepare('SELECT * FROM `roommobs` WHERE `roomid`=? ');
 		$stmt->bindValue(1, $_GET['room']);
 		$stmt->execute();
-		foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $mob)
-		{	
-			$mobid = $mob['id'];
-			$mobname = $mob['name'];
-			echo '<tr><td>';
-                        $mobtitle = 'viewmobs';
+                $roommob = $stmt->fetch();
+                $roommobid = $roommob['roommobid'];
+                $mobid = $roommob['mobid'];
+                $hex = $roommob['hex'];
+                $type = $roommob['type'];
+                
+                //now get the mob data.
+                if ($type == 'norm')
+                {
+                        $active = 1;
+                        $stmt = $dbh->prepare('SELECT * FROM `mobs` WHERE `mobid`=? AND `active`=? ');
+                        $stmt->bindValue(1, $mobid);
+                        $stmt->bindValue(2, $active);
+          		foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $mob)
+		        {	
+                                echo '<tr><td>';
+			        $mobname = $mob['name'];
+                                $moblevel = $mob['level'];
+                                $trainer = $mob['trainer'];
+                                $rage = $mob['rage'];
+                                $mobtitle = 'viewmobs';
 		?>
 	                <div style="border-bottom:1px dotted; border-color:#000000; height:15px;"> 
                         <a href="mobattack.php?mob=<?php echo ' '.$mobid.' '; ?>"><?php echo ' '.$mobname.' '; ?>
@@ -214,6 +242,7 @@ else
 	                <a href="<?php echo ' '.$mobtitle.' ';?>.php?mob=<?php echo ' '.$mobid.' '; ?>" style="cursor:pointer;">
 	                </div>
                 <?php
+                        }
                 }
                 ?>
 	</tr>
