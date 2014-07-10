@@ -13,10 +13,10 @@ class WorldMap
 	        $this->roomid = $roomid;
 	        
 	        if (isset($_GET['direction']))
-		    {
-                $direction = htmlentities(stripslashes($_GET['direction']));
-			    $this->movePlayer($direction);
-		    }
+		{
+                	$direction = htmlentities(stripslashes($_GET['direction']));
+			$this->movePlayer($direction);
+		}
 	}
 
 	public function roomData()
